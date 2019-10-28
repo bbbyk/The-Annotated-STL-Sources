@@ -27,7 +27,9 @@
 /* NOTE: This is an internal header file, included by other STL headers.
  *   You should not attempt to use it directly.
  */
-
+/**
+ * 定义5个全局函数
+ * **/
 #ifndef __SGI_STL_INTERNAL_UNINITIALIZED_H
 #define __SGI_STL_INTERNAL_UNINITIALIZED_H
 
@@ -71,6 +73,7 @@ __uninitialized_copy(_InputIter __first, _InputIter __last,
   return __uninitialized_copy_aux(__first, __last, __result, _Is_POD());
 }
 
+// 将内存的配置与对象的
 template <class _InputIter, class _ForwardIter>
 inline _ForwardIter
   uninitialized_copy(_InputIter __first, _InputIter __last,
