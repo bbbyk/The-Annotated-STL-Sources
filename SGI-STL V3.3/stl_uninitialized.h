@@ -83,9 +83,11 @@ inline _ForwardIter
                               __VALUE_TYPE(__result));
 }
 
+// uninitialized_copy特化版本 
+// 是否可以使用 当确认__first 和 __last没有重叠的时候，用memcpy会快一点
 inline char* uninitialized_copy(const char* __first, const char* __last,
                                 char* __result) {
-  memmove(__result, __first, __last - __first);
+  memmove(__result, __first, __last - __first); 
   return __result + (__last - __first);
 }
 
@@ -182,7 +184,8 @@ inline void uninitialized_fill(_ForwardIter __first,
 }
 
 // Valid if copy construction is equivalent to assignment, and if the
-//  destructor is trivial.
+//  destructor is trivial(defalut).
+// 是copy cons = assig cons 
 template <class _ForwardIter, class _Size, class _Tp>
 inline _ForwardIter
 __uninitialized_fill_n_aux(_ForwardIter __first, _Size __n,
@@ -191,6 +194,7 @@ __uninitialized_fill_n_aux(_ForwardIter __first, _Size __n,
   return fill_n(__first, __n, __x);
 }
 
+// not POD
 template <class _ForwardIter, class _Size, class _Tp>
 _ForwardIter
 __uninitialized_fill_n_aux(_ForwardIter __first, _Size __n,
@@ -199,7 +203,7 @@ __uninitialized_fill_n_aux(_ForwardIter __first, _Size __n,
   _ForwardIter __cur = __first;
   __STL_TRY {
     for ( ; __n > 0; --__n, ++__cur)
-      _Construct(&*__cur, __x);
+      _Construct(&*__cur, __x); // placement new
     return __cur;
   }
   __STL_UNWIND(_Destroy(__first, __cur));
@@ -210,14 +214,14 @@ inline _ForwardIter
 __uninitialized_fill_n(_ForwardIter __first, _Size __n, const _Tp& __x, _Tp1*)
 {
   typedef typename __type_traits<_Tp1>::is_POD_type _Is_POD;
-  return __uninitialized_fill_n_aux(__first, __n, __x, _Is_POD());
+  return __uninitialized_fill_n_aux(__first, __n, __x, _Is_POD()); // 判断该型别是否为POD
 }
 
 template <class _ForwardIter, class _Size, class _Tp>
 inline _ForwardIter 
 uninitialized_fill_n(_ForwardIter __first, _Size __n, const _Tp& __x)
 {
-  return __uninitialized_fill_n(__first, __n, __x, __VALUE_TYPE(__first));
+  return __uninitialized_fill_n(__first, __n, __x, __VALUE_TYPE(__first)); // VALUEW_TYPE取出first的value type
 }
 
 // Extensions: __uninitialized_copy_copy, __uninitialized_copy_fill, 
