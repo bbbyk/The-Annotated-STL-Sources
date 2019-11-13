@@ -40,22 +40,24 @@ __STL_BEGIN_NAMESPACE
 #pragma set woff 1375
 #endif
 
+// 双向链表
 struct _List_node_base {
   _List_node_base* _M_next;
   _List_node_base* _M_prev;
 };
-
+// 双向链表数据结构
 template <class _Tp>
 struct _List_node : public _List_node_base {
   _Tp _M_data;
 };
 
+// 迭代器 type: Bidirectional
 struct _List_iterator_base {
   typedef size_t                     size_type;
   typedef ptrdiff_t                  difference_type;
   typedef bidirectional_iterator_tag iterator_category;
 
-  _List_node_base* _M_node;
+  _List_node_base* _M_node; 
 
   _List_iterator_base(_List_node_base* __x) : _M_node(__x) {}
   _List_iterator_base() {}
@@ -65,8 +67,8 @@ struct _List_iterator_base {
 
   bool operator==(const _List_iterator_base& __x) const {
     return _M_node == __x._M_node;
-  }
   bool operator!=(const _List_iterator_base& __x) const {
+  }
     return _M_node != __x._M_node;
   }
 };  
@@ -80,13 +82,13 @@ struct _List_iterator : public _List_iterator_base {
   typedef _Tp value_type;
   typedef _Ptr pointer;
   typedef _Ref reference;
-  typedef _List_node<_Tp> _Node;
+  typedef _List_node<_Tp> _Node; 
 
   _List_iterator(_Node* __x) : _List_iterator_base(__x) {}
   _List_iterator() {}
   _List_iterator(const iterator& __x) : _List_iterator_base(__x._M_node) {}
 
-  reference operator*() const { return ((_Node*) _M_node)->_M_data; }
+  reference operator*() const { return ((_Node*) _M_node)->_M_data; } // 动态
 
 #ifndef __SGI_STL_NO_ARROW_OPERATOR
   pointer operator->() const { return &(operator*()); }
@@ -105,7 +107,7 @@ struct _List_iterator : public _List_iterator_base {
     this->_M_decr();
     return *this;
   }
-  _Self operator--(int) { 
+  _Self operator--(int) {
     _Self __tmp = *this;
     this->_M_decr();
     return __tmp;
@@ -213,7 +215,7 @@ public:
 };
 
 #else /* __STL_USE_STD_ALLOCATORS */
-
+// base class主要是内存的管理
 template <class _Tp, class _Alloc>
 class _List_base 
 {
@@ -234,12 +236,15 @@ public:
   void clear();
 
 protected:
+  // list的配置器
   typedef simple_alloc<_List_node<_Tp>, _Alloc> _Alloc_type;
+  // 分配空节点
   _List_node<_Tp>* _M_get_node() { return _Alloc_type::allocate(1); }
+  // 释放节点
   void _M_put_node(_List_node<_Tp>* __p) { _Alloc_type::deallocate(__p, 1); } 
 
 protected:
-  _List_node<_Tp>* _M_node;
+  _List_node<_Tp>* _M_node; // 头节点
 };
 
 #endif /* __STL_USE_STD_ALLOCATORS */
@@ -428,6 +433,7 @@ public:
        const allocator_type& __a = allocator_type())
     : _Base(__a)
     { insert(begin(), __n, __value); }
+    
   explicit list(size_type __n)
     : _Base(allocator_type())
     { insert(begin(), __n, _Tp()); }

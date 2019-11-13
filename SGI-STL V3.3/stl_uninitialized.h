@@ -45,6 +45,7 @@ __uninitialized_copy_aux(_InputIter __first, _InputIter __last,
                          _ForwardIter __result,
                          __true_type)
 {
+   // memcpy 
   return copy(__first, __last, __result);
 }
 
