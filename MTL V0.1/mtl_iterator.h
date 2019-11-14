@@ -17,7 +17,6 @@ struct forward_iterator_tag : public input_iterator_tag { };
 struct bidirect_iterator_tag : public forward_iterator_tag { };
 struct random_access_iterator_tag : public bidirect_iterator_tag { };
 
-// iterator
 
 // traits to get the type of contain we need
 template < class I>
