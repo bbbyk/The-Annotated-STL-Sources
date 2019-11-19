@@ -85,7 +85,7 @@ private:
     union obj // freelists节点构造
     {
         union obj* free_list_link; // 未使用区块 
-        // char client_data[1]; // 客户端使用的区块 1 字节
+        char client_data[1]; // 客户端使用的区块 1 字节
     };
     // 字节上调
     static size_t ROUND_UP(size_t n) {
