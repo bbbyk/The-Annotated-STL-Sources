@@ -3,6 +3,7 @@
  * Date: 2019.11.06
  * 
  * 实现第一级内存配置器和第二级内存配置器，并封装为simple_alloc
+ * 默认将二级适配器define为alloc供所有容器默认使用
  * **/
 
 #ifndef MTL_ALLOC_H
@@ -12,6 +13,8 @@
 #include <cstdlib>
 #include <memory>
 #include <cstring>
+
+#define __default_alloc alloc
 // 一级内存配置器
 class __base_alloc{
 private:
@@ -232,6 +235,22 @@ char *__default_alloc::chunk_alloc(size_t size, int &nobjs) {
         return chunk_alloc(size, nobjs); // 修正成员
     }
 }
+
+// 封装配置器
+template<class T, class Alloc>
+class simple_alloc {
+public:
+    static T *allocate(size_t n)
+            { return n==0? NULL: (T*)Alloc::allocate(sizeof(T) * n); }
+    static T *allocate()
+            { return (T*)Alloca::allocate(sizeof(T)); }
+    static void deallocate(T *p, size_t n)
+            { if (n!=0)  Alloc::deallocate(p, sizeof(T)*n)); }
+    static void deallocate(T *p)
+            { Alloc::deallocate(p, sizeof(T)); }
+    static T *reallocate(T *p, size_t old_n, size_t new_n)
+            { return new_n == 0? NULL: Alloc::reallocate(p, old_n, new_n); }
+};
 
 #endif
 

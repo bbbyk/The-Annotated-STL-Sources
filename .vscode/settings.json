@@ -2,6 +2,7 @@
     "files.associations": {
         "vector": "cpp",
         "cstddef": "cpp",
-        "pthread_alloc": "cpp"
+        "pthread_alloc": "cpp",
+        "type_traits": "cpp"
     }
 }
