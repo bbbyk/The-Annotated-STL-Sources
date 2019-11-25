@@ -162,7 +162,7 @@ template <class _Tp>
 inline _Tp*
 __copy_trivial(const _Tp* __first, const _Tp* __last, _Tp* __result) {
   memmove(__result, __first, sizeof(_Tp) * (__last - __first));
-  return __result + (__last - __first);
+  return __result + (__last - __first);m
 }
 
 #if defined(__STL_FUNCTION_TMPL_PARTIAL_ORDER)

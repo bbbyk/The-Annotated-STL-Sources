@@ -87,7 +87,7 @@ inline ForwardIterator __uninitialized_copy_aux(ForwardIterator first, ForwardIt
 
 
 template <class ForwardIterator, class InputIterator>
-inline ForwardIterator __uninitialized_copt_aux(ForwardIterator first, ForwardIterator last, InputIterator result, __false_type) {
+inline ForwardIterator __uninitialized_copy_aux(ForwardIterator first, ForwardIterator last, InputIterator result, __false_type) {
     // no-POD 用construct调用构造函数
     // 异常处理
     ForwardIterator cur = first;

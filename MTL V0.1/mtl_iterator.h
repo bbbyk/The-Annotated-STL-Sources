@@ -27,7 +27,7 @@ public:
     typedef typename I::difference_type difference_type;
     typedef typename I::reference reference;
     typedef typename I::pointer pointer;
-    typedef typename I::random_access_iterator_tag iterator_category;
+    typedef typename I::iterator_category iterator_category;
 };
 
 // the particularize of traits (native-pointer)
