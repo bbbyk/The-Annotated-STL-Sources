@@ -3,6 +3,7 @@
 #include "mtl_iterator.h"
 #include "mtl_alloc.h"
 #include "mtl_uninitialized.h"
+#include "stl_algobase.h"
 /** list node设计**/
 template <class T>
 struct _list_node
@@ -44,6 +45,18 @@ struct _list_iterator
     self& operator--() {
         node = (link_type) ((*node).prev);
         return *this;
+    }
+    self operator-(int n) {
+        link_type tem = node;
+        while(n--)
+            tem = tem->prev;
+        return tem;
+    }
+    self operator+(int n) {
+        link_type tem = node;
+        while(n++)
+            tem = tem->next;
+        return tem;
     }
 };
 
@@ -118,6 +131,20 @@ public:
     typedef _list_iterator<T, const T&, const T*> const_iterator;
 
 protected:
+    // 工具函数，连续范围内的节点移到pos节点之前
+    void transfer(iterator pos, iterator first, iterator last)
+    {
+        if (pos == last) return;
+        last.node->prev->next = pos.node;
+        first.node->prev->next = last.node;
+        pos.node->prev->next = first.node;
+        link_type tem = pos.node->prev;
+        pos.node->prev = last.node->prev;
+        last.node->prev = first.node->prev;
+        first.node->prev = tem;
+    }
+
+public:
     using _Base::node;
     using _Base::get_node;
     using _Base::put_node; 
@@ -185,6 +212,18 @@ protected:
             first = next;
         }
     }
+
+    template <class UnaryPredicate>
+    remove_if(UnaryPredicate p) {
+        iterator first = begin();
+        iterator last = end();
+        while (first != last) {
+            iterator next = first;
+            ++next;
+            if (p(*first)) erase(first);
+            first = next;
+        }
+    }
     // 数值相同的连续元素只保存一个
     void unique() {
         iterator first = begin();
@@ -199,7 +238,92 @@ protected:
             next = first;
         }
     }
+    void swap(List &other) {
+        ::swap(*this, other);
+    }
+
+    /** 操作 **/
+    // 在C++11版本之后的splice要指明std::move进行splice操作，因为其本身就把other剪切
+    // pos 和 other指向同一个list，其行为未定义
+    #if __cplusplus > 201103L:
+        void splice(iterator pos, List &&other)
+    #else 
+        void splice(iterator pos, List &other)
+    #endif
+    {
+        if (!other.empty())
+            transfer(pos, other.begin(), other.end());
+    }
+    // 将i所指元素置于pos之前 other和*this可指向同一个
+    #if __cplusplus > 201103L:
+        void splice(iterator pos, List &&other, iterator i)
+    #else
+        void splice(iterator pos, List &other, iterator i)
+    #endif
+    {
+        if (pos == i || pos == i+1)
+            return;
+        transfer(pos, i, i+1); 
+    }
+    #if __cplusplus > 201103L:
+        void splice(iterator pos, List &&other, iterator first, iterator last)
+    #else 
+        void splice(iterator pos, List &other, iterator first, iterator last)
+    #endif
+    {
+        if (first != last)
+            transfer(pos, first, last);
+    }
+    // merge合并两个已经递增排序的链表
+    #if __cplusplus > 201103L:
+        void merge(List &&other )
+    #else 
+        void merge(List &other)
+    #endif
+    {
+        iterator first1 = begin(), last1 = end();
+        iterator first2 = other.begin(), last2 = other.end();
+        iterator next;
+        while (first1 != last1 && first2 != last2) {
+            while (first1 != last1 && *first1 < *first2)
+                first1++;
+            next = first2;
+            while (netx != last2 && *first1 > *next)
+                next++;
+            transfer(first1, first2, next);
+            first2 = next;
+        }
+        if (first2 != last2)
+            transfer(last1, first2, last2);
+    }
+    
+    void reverse(); // 内容逆向重置
+    void sort(); //STL的sort只接受random_access_iterator
 };
+
+template <class T, class Alloc>
+void List<T, Alloc>::reverse()
+{
+    // size()函数比较慢
+    if (node->next == node || (node->next)->next == node)
+        return;
+    iterator first = begin();
+    ++first;
+    while (first != end()) {
+        iterator old = first;
+        ++first;
+        transfer(begin(), old, first);
+    }
+}
+
+// 非递归归并排序 时间复杂度O(nlogn) 空间O(n)
+// SGI中的算法 很厉害
+template <class T, class Alloc>
+void List<T, Alloc>::sort()
+{
+    
+}
 
 
 #endif
+    

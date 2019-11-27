@@ -43,6 +43,7 @@
         "streambuf": "cpp",
         "utility": "cpp",
         "typeinfo": "cpp",
-        "memory_resource": "cpp"
+        "memory_resource": "cpp",
+        "string_view": "cpp"
     }
 }
